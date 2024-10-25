@@ -21,7 +21,7 @@ ext_modules = [
 # Setup configuration
 setup(
     name="chi2sim",
-    version="1.0.0",
+    version="1.0.1",
     packages=["chi2sim"],
     ext_modules=cythonize(
         ext_modules,

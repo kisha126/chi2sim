@@ -10,9 +10,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chi2sim"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"},
+    {name = "Joshua Marie Ongcoy", email = "joshstat126@gmail.com"},
 ]
 description = "Chi-square test with Monte Carlo simulation"
 readme = "README.md"
