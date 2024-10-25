@@ -11,7 +11,7 @@ cdef extern from "src/chi_square_mc.h":
     double chi_square_stat(int** observed, double** expected, int nrow, int ncol)
     double monte_carlo_pvalue(int** observed, int nrow, int ncol, int simulations)
 
-def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int simulations=10000):
+def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int n_sim=10000):
     """
     Perform Chi-square test using Monte Carlo simulation for contingency tables.
 
@@ -19,8 +19,8 @@ def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int simulations=10000)
     -----------
     table : numpy.ndarray
         2D contingency table of observed frequencies
-    simulations : int, optional
-        Number of Monte Carlo simulations (default: 10000)
+    n_sim : int, optional
+        Number of Monte Carlo n_sim (default: 10000)
 
     Returns:
     --------
@@ -52,7 +52,7 @@ def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int simulations=10000)
 
     try:
         # Call the C function
-        p_value = monte_carlo_pvalue(c_table, nrow, ncol, simulations)
+        p_value = monte_carlo_pvalue(c_table, nrow, ncol, n_sim)
     finally:
         # Clean up
         for i in range(nrow):
@@ -61,5 +61,5 @@ def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int simulations=10000)
 
     return {
         'p_value': p_value,
-        'simulations': simulations
+        'n_sim': n_sim
     }
