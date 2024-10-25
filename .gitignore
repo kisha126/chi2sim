@@ -1,2 +1,7 @@
 *.pyc
 *.pyd
+.Rproj.user
+
+chi2sim/chi_square_mc.c
+chi2sim.egg-info
+build/*
