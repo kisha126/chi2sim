@@ -1,6 +1,7 @@
 # chi2sim
 
 Chi-square test with Monte Carlo simulation for contingency tables.
+This is still under construction.
 
 ## Installation
 
