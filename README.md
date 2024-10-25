@@ -12,7 +12,7 @@ pip install chi2sim
 
 ```python
 import numpy as np
-from chi2sim import chi_square_test
+from chi2sim import chi2_cont_sim
 
 # Example contingency table
 table = np.array([
@@ -21,8 +21,8 @@ table = np.array([
 ], dtype=int)
 
 # Perform chi-square test with Monte Carlo simulation
-result = chi_square_test(table, simulations=10000)
-print(f"P-value: {result['p_value']}")
+result = chi2_cont_sim(table)
+print(result)
 ```
 
 ## Features
@@ -39,3 +39,12 @@ print(f"P-value: {result['p_value']}")
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+## Citation
+
+If you use the `chi2sim` package in your work, please cite the following:
+
+Hope, A. C. A. (1968). A simplified Monte Carlo significance test procedure. Journal of the Royal Statistical Society Series B, 30, 582–598. doi:10.1111/j.2517-6161.1968.tb00759.x.
+
+

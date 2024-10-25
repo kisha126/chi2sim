@@ -5,9 +5,9 @@ import numpy as np
 # Define the extension
 ext_modules = [
     Extension(
-        "chi2sim.chi_square_mc",
+        "chi2sim.chi2_cont_sim",
         sources=[
-            "chi2sim/chi_square_mc.pyx",
+            "chi2sim/chi2_cont_sim.pyx",  # Updated filename
             "chi2sim/src/chi_square_mc.c"
         ],
         include_dirs=[
@@ -20,6 +20,8 @@ ext_modules = [
 
 # Setup configuration
 setup(
+    name="chi2sim",
+    version="1.1.1",
     packages=["chi2sim"],
     ext_modules=cythonize(
         ext_modules,
@@ -29,4 +31,7 @@ setup(
             'wraparound': False,
         }
     ),
+    install_requires=[
+        "numpy",
+    ],
 )
