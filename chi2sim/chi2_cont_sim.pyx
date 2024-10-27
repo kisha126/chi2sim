@@ -20,12 +20,12 @@ def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int n_sim=10000):
     table : numpy.ndarray
         2D contingency table of observed frequencies
     n_sim : int, optional
-        Number of Monte Carlo simulations (default: 10000)
+        Number of Monte Carlo n_sim (default: 10000)
 
     Returns:
     --------
     dict
-        Dictionary containing Chi-square statistic, p-value, and other test statistics
+        Dictionary containing p-value and other test statistics
     """
     if table.ndim != 2:
         raise ValueError("Table must be 2-dimensional")
@@ -35,74 +35,64 @@ def chi2_cont_sim(np.ndarray[int, ndim=2] table not None, int n_sim=10000):
 
     # Convert numpy array to C array
     cdef int** c_table = <int**>malloc(nrow * sizeof(int*))
-    if not c_table:
-        raise MemoryError("Failed to allocate memory for table")
+    cdef double** expected_table = <double**>malloc(nrow * sizeof(double*))  # Allocate expected table
+    if not c_table or not expected_table:
+        raise MemoryError("Failed to allocate memory for table or expected table")
 
+    cdef int i, j
+    cdef double row_sum, col_sum, total_sum
+
+    # Calculate row sums, column sums, and total sum
+    cdef double* row_totals = <double*>malloc(nrow * sizeof(double))
+    cdef double* col_totals = <double*>malloc(ncol * sizeof(double))
+    if not row_totals or not col_totals:
+        raise MemoryError("Failed to allocate memory for row or column totals")
+
+    total_sum = 0
+    for i in range(nrow):
+        row_totals[i] = 0
+        for j in range(ncol):
+            row_totals[i] += table[i, j]
+        total_sum += row_totals[i]
+
+    for j in range(ncol):
+        col_totals[j] = 0
+        for i in range(nrow):
+            col_totals[j] += table[i, j]
+
+    # Populate c_table and calculate expected_table
     for i in range(nrow):
         c_table[i] = <int*>malloc(ncol * sizeof(int))
-        if not c_table[i]:
+        expected_table[i] = <double*>malloc(ncol * sizeof(double))  # Allocate expected table row
+        if not c_table[i] or not expected_table[i]:
             # Clean up already allocated memory
-            for j in range(i):
-                free(c_table[j])
+            for k in range(i):
+                free(c_table[k])
+                free(expected_table[k])
             free(c_table)
-            raise MemoryError("Failed to allocate memory for table row")
+            free(expected_table)
+            raise MemoryError("Failed to allocate memory for table or expected table row")
 
         for j in range(ncol):
             c_table[i][j] = table[i, j]
+            expected_table[i][j] = (row_totals[i] * col_totals[j]) / total_sum  # Calculate expected value
 
     try:
-        # Step 1: Compute Chi-square statistic
-        # We first need the expected values. Using rcont to get expected table
-        # (as rcont generates tables based on given row/column sums).
-        # Generate the expected table
-        row_sums = np.sum(table, axis=1)
-        col_sums = np.sum(table, axis=0)
-        total = np.sum(row_sums)
-
-        # Convert row_sums and col_sums to C arrays
-        cdef int* c_row_sums = <int*>malloc(nrow * sizeof(int))
-        cdef int* c_col_sums = <int*>malloc(ncol * sizeof(int))
-        cdef double** expected_table = <double**>malloc(nrow * sizeof(double*))
-
-        if not c_row_sums or not c_col_sums or not expected_table:
-            raise MemoryError("Failed to allocate memory for expected table")
-
-        for i in range(nrow):
-            c_row_sums[i] = row_sums[i]
-            expected_table[i] = <double*>malloc(ncol * sizeof(double))
-            if not expected_table[i]:
-                for j in range(i):
-                    free(expected_table[j])
-                free(expected_table)
-                raise MemoryError("Failed to allocate memory for expected table rows")
-
-        for j in range(ncol):
-            c_col_sums[j] = col_sums[j]
-
-        # Calculate expected frequencies: (row_sum[i] * col_sum[j]) / total
-        for i in range(nrow):
-            for j in range(ncol):
-                expected_table[i][j] = (c_row_sums[i] * c_col_sums[j]) / total
-
-        # Step 2: Compute the Chi-square statistic
-        chi_square = chi_square_stat(c_table, expected_table, nrow, ncol)
-
-        # Step 3: Perform Monte Carlo simulation for p-value
+        # Call the C function
         p_value = monte_carlo_pvalue(c_table, nrow, ncol, n_sim)
-        
+        chi2_stat = chi_square_stat(c_table, expected_table, nrow, ncol)
     finally:
-        # Clean up C memory allocations
+        # Clean up
         for i in range(nrow):
             free(c_table[i])
             free(expected_table[i])
         free(c_table)
         free(expected_table)
-        free(c_row_sums)
-        free(c_col_sums)
+        free(row_totals)
+        free(col_totals)
 
-    # Return the Chi-square statistic, p-value, and number of simulations
     return {
-        'statistic': chi_square,
+        'statistic' : chi2_stat,
         'p_value': p_value,
         'n_sim': n_sim
     }
