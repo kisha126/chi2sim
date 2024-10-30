@@ -1,3 +1,4 @@
+import sys
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy as np
@@ -14,14 +15,15 @@ ext_modules = [
             np.get_include(),
             "chi2sim/src"
         ],
-        depends=["chi2sim/src/chi_square_mc.h"]
+        depends=["chi2sim/src/chi_square_mc.h"],
+        extra_compile_args=["/O2"] if sys.platform == "win32" else ["-O2"]
     )
 ]
 
 # Setup configuration
 setup(
     name="chi2sim",
-    version="1.0.2",
+    version="1.0.2.2",
     packages=["chi2sim"],
     ext_modules=cythonize(
         ext_modules,

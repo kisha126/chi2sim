@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chi2sim"
-version = "1.0.2"
+version = "1.0.2.2"
 authors = [
     {name = "Joshua Marie Ongcoy", email = "joshstat126@gmail.com"},
 ]
@@ -39,5 +39,5 @@ keywords = ["statistics", "chi-square", "monte-carlo", "simulation"]
 "Bug Tracker" = "https://github.com/kisha126/chi2sim/issues"
 "Documentation" = "https://github.com/kisha126/chi2sim#readme"
 
-
-
+[tool.cibuildwheel]
+skip = ["*-win32", "*-manylinux_i686"]
