@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chi2sim"
-version = "1.0.2.2"
+version = "1.0.2.3"
 authors = [
     {name = "Joshua Marie Ongcoy", email = "joshstat126@gmail.com"},
 ]
